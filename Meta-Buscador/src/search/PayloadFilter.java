@@ -33,6 +33,7 @@ public class PayloadFilter extends TokenFilter{
 	private Fourier fourier;
 	private double[] queryCoef;
 	private models.Query query;
+	private float docValue;
 	
 	/**
 	 * Aumenta el tamaño del documento (al comienzo de este),
@@ -47,22 +48,14 @@ public class PayloadFilter extends TokenFilter{
 	 * @param input
 	 * @param lista
 	 */
-	protected PayloadFilter(TokenStream input, HashMap<String, LinkedList<Integer>> lista, models.Query query) {
+	protected PayloadFilter(TokenStream input, HashMap<String, LinkedList<Integer>> lista, models.Query query, float docValue) {
 		super(input);
 		this.lista = lista;
 		term = addAttribute(CharTermAttribute.class);
 		payload = addAttribute(PayloadAttribute.class);
 		fourier = new Fourier();
 		this.query = query;
-		this.query.setTerms(new String[9]);
-		this.query.setValues(new float[9]);
-		
-		
-		for (int i=0; i < 9; i++)
-		{
-			query.getTerms()[i] = "";
-			query.getValues()[i] = 0.0F;
-		}
+		this.docValue = docValue;
 		/**
 		 * Calculo del tamaño del doc.
 		 */
@@ -104,9 +97,14 @@ public class PayloadFilter extends TokenFilter{
 		double[] coefs = this.getCoefs(builder.toString());
 		double similitud = this.calculoSimilitud(queryCoef, coefs);
 		
-		//System.out.print(builder.toString()+"|"+similitud + ", ");
 		
-		similitud = similitud*1;
+		
+		/**
+		 * El orden inicial de los documentos tiene relevancia para la seleccion de los terminos cercanos a la query.
+		 */
+		similitud = Math.abs(similitud);
+		similitud = similitud*docValue;
+		System.out.print(builder.toString()+"|"+similitud + ", ");
 		/**
 		 * Generacion de los terminos mas cercanos,
 		 * Almacenados dentro de la query.

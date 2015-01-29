@@ -40,12 +40,27 @@ public class Test {
 		IndexWriterConfig config = new IndexWriterConfig(Version.LATEST, new PayloadAnalyzer(query,0));
 		IndexWriter writer = new IndexWriter(dir, config);
 		
+		query.setTerms(new String[9]);
+		query.setValues(new float[9]);
+		
+		for (int i=0; i < 9; i++)
+		{
+			query.getTerms()[i] = "";
+			query.getValues()[i] = 0.0F;
+		}
+		
 		for (int i=0; i < docs.length; i++)
 		{
 			Document doc = new Document();
 			
 			doc.add((IndexableField) new org.apache.lucene.document.TextField("body", docs[i], Store.YES));
-			writer.addDocument(doc, new PayloadAnalyzer(query, 1/(i+1)/4));
+			
+			/**
+			 * Calculo del orden del documento.
+			 */
+			float value =(float)(-Math.pow((double)i, 2.0)/Math.pow(4.0, 2.0) + 1.F);
+			System.out.println("value:" + value);
+			writer.addDocument(doc, new PayloadAnalyzer(query,value));
 			System.out.println();
 			System.out.println(Arrays.toString(query.getTerms()));
 			System.out.println(Arrays.toString(query.getValues()));

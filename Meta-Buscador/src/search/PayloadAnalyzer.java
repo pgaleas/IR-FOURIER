@@ -27,7 +27,7 @@ import org.apache.lucene.analysis.core.WhitespaceTokenizer;
  */
 public class PayloadAnalyzer extends Analyzer{
 	private models.Query query;
-	private float doc;
+	private float docValue;
 	
 	/**
 	 * Constructor de la clase.
@@ -35,7 +35,7 @@ public class PayloadAnalyzer extends Analyzer{
 	 */
 	public PayloadAnalyzer(models.Query query, float doc) {
 		this.query = query;
-		this.doc = doc;
+		this.docValue = doc;
 	}
 	
 	/**
@@ -109,7 +109,7 @@ public class PayloadAnalyzer extends Analyzer{
 		source = new WhitespaceTokenizer(r2);
 		filter = new LowerCaseFilter(source);
 		//filter = new StopFilter(filter, stopWords);
-		filter = new PayloadFilter(filter, lista, query);
+		filter = new PayloadFilter(filter, lista, query, docValue);
 		
 		return new TokenStreamComponents(source, filter);
 	}
