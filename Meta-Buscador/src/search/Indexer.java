@@ -16,6 +16,7 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 
 import util.DBManager;
+import util.MathUtil;
 
 
 /**
@@ -95,6 +96,18 @@ public class Indexer {
 	{
 		Page[] pages = DBManager.getPagesFromQuery(this.query);
 		
+		/**
+		 * Inicializacion en 0 de las listas de terminos.
+		 * Necesario para calcular el grafo de terminos relacionados.
+		 */
+		query.setTerms(new String[Constants.MAX_TERMS_SIZE]);
+		query.setValues(new float[Constants.MAX_TERMS_SIZE]);
+		for (int i=0; i < Constants.MAX_TERMS_SIZE; i++)
+		{
+			query.getTerms()[i] = "";
+			query.getValues()[i] = 0.0F;
+		}
+		
 		for (int i=0; i < pages.length; i++)
 		{
 			System.out.println(pages[i]);
@@ -109,7 +122,7 @@ public class Indexer {
 					doc.add(new IntField(Constants.DOCID, i, Field.Store.YES));
 					
 					//Es necesario usar un nuevo PayloadAnalyzer para cada documento.
-					writer.addDocument(doc, new PayloadAnalyzer(query, 1/(i/Constants.PAGES)));
+					writer.addDocument(doc, new PayloadAnalyzer(query, MathUtil.ordenDocumento(i)));
 					
 					// Fundamental despues de haber incluido un documento.
 					writer.commit();

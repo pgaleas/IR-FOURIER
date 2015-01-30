@@ -15,11 +15,10 @@ public class Constants {
 	   public static final String SNIPPET="snippet"; 
 	   public static final String DOCID="doc_id"; 
 	   public static final int MAX_SEARCH = 10;
-	   public static int PAGES = 50;
+	   public static final int PAGES = 5;
+	   
 	   /**
-		 * Aumenta el tamaño del documento en un 10% al comienzo de este,
-		 *  para evitar los efectos que produce la funcion de forier en 
-		 *  los bordes del documento por la periodicidad de las funciones seno y coseno
-		 */
-	   public static final float PORCENTAJE_LARGO_EXTRA_DOCUMENTO = 0.15F;
+	    * Cantidad de elementos para calcular el grafo.
+	    */
+	   public static final int MAX_TERMS_SIZE = 10;
 }

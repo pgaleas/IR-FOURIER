@@ -57,18 +57,23 @@ public class PayloadSimilarity extends DefaultSimilarity{
 			builder.append((char)(bytes[i]));
 		}
 		
-		int increment = 0;
-		
-		if ("javier".equals(builder.toString()))
+		/**
+		 * Se busca si existe alguna coincidencia en la lista de terminos relacionados con el token.
+		 * Se ponderan ambos valores (relevancia del termino relacionado y la distancia del token a la palabra.
+		 */
+		float increment = 0.0F;
+		for (int i=0; i < query.getTerms().length; i++)
 		{
-			increment = 1;
+			if (builder.toString().equals(query.getTerms()[i]))
+			{
+				increment = 10.F * query.getValues()[i];
+				break;
+			}
 		}
 		
 		/**
 		 * Valor retornado incrementa el boosting de un documento.
 		 */
-		//uso de las querys para obtener los pesos de los terminos relevantes.
-		System.out.println(similitud);
 		return (float)((similitud)*increment);
 	}
 }

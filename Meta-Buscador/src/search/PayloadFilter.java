@@ -3,18 +3,17 @@ package search;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
-
-import math.Fourier;
 
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.util.BytesRef;
+
+import util.MathUtil;
 
 /**
  * 
@@ -30,18 +29,10 @@ public class PayloadFilter extends TokenFilter{
 	private HashMap<String, LinkedList<Integer>> lista;
 	private PayloadAttribute payload;
 	private CharTermAttribute term;
-	private Fourier fourier;
-	private double[] queryCoef;
 	private models.Query query;
 	private float docValue;
+	private int pos;
 	
-	/**
-	 * Aumenta el tamaño del documento (al comienzo de este),
-	 *  para evitar los efectos que produce la funcion de Fourier en 
-	 *  los bordes del documento por la periodicidad de las funciones seno y coseno.
-	 */
-	private int largo_extra_doc;
-
 	/**
 	 * Constructor de la clase
 	 * <p> Permite inicializar el filtro, recibiendo la lista de palabras con sus ubicaciones por documento.
@@ -53,29 +44,10 @@ public class PayloadFilter extends TokenFilter{
 		this.lista = lista;
 		term = addAttribute(CharTermAttribute.class);
 		payload = addAttribute(PayloadAttribute.class);
-		fourier = new Fourier();
 		this.query = query;
 		this.docValue = docValue;
-		/**
-		 * Calculo del tamaño del doc.
-		 */
-		Collection<LinkedList<Integer>> col = lista.values();
-		Iterator<LinkedList<Integer>> iter = col.iterator();
-		int cont = 0;
-		while (iter.hasNext())
-		{
-			cont += iter.next().size();
-		}
-		
-		/**
-		 * Calcula el largo extra del documento.
-		 */
-		largo_extra_doc = (int)(cont*Constants.PORCENTAJE_LARGO_EXTRA_DOCUMENTO);
-		
-		fourier.setScale(cont + largo_extra_doc);
-		fourier.setMaxOrder(6);
-		this.queryCoef = this.getCoefs(query.getQuery());
-		
+		//Conteo de palabras
+		this.pos = 0;
 	}
 	
 	/**
@@ -92,44 +64,30 @@ public class PayloadFilter extends TokenFilter{
 		builder.append(Arrays.copyOfRange(term.buffer(), 0, term.length()));
 		
 		/**
-		 * Calculo similitud.
+		 * Calculo de distancia hacia la query.
 		 */
-		double[] coefs = this.getCoefs(builder.toString());
-		double similitud = this.calculoSimilitud(queryCoef, coefs);
+		float similitud = 0.0F;
+		Iterator<Integer> iter = lista.get(query.getQuery()).iterator();
+		while (iter.hasNext())
+		{
+			int p = iter.next();
+			float aux = MathUtil.distancia(pos, p);
+			if (similitud < aux)
+				similitud = aux;
+		}
+		/**
+		 * Reduccion dada por el ranking.
+		 * docValue = 1 -> 0
+		 */
+		similitud*=docValue;
+		System.out.print(builder.toString()+"|"+similitud+" ");
 		
 		
 		
 		/**
 		 * El orden inicial de los documentos tiene relevancia para la seleccion de los terminos cercanos a la query.
 		 */
-		similitud = Math.abs(similitud);
-		similitud = similitud*docValue;
-		System.out.print(builder.toString()+"|"+similitud + ", ");
-		/**
-		 * Generacion de los terminos mas cercanos,
-		 * Almacenados dentro de la query.
-		 */
-		if (!builder.toString().equals(query.getQuery()))
-		{
-			int min = 0;
-			float mindiff = 5.0F;
-			for (int i=0; i < query.getTerms().length; i++)
-			{
-				float diff = Math.abs(query.getValues()[i] - (float)similitud);
-				if (diff < mindiff)
-					continue;
-				
-				if (query.getValues()[i] < (float)similitud)
-				{
-					min = i;
-				}
-				
-			}
-			if (similitud > 0){
-				query.getValues()[min] = (float)similitud;
-				query.getTerms()[min] = builder.toString();
-			}
-		}
+		
 		
 		/**
 		 * Conversion a bytes
@@ -151,70 +109,7 @@ public class PayloadFilter extends TokenFilter{
 		 */
 		BytesRef br = new BytesRef(bytes);
 		payload.setPayload(br);
-		
+		pos++;
 		return true;
-	}
-	
-	/**
-	 * 
-	 * Calculo de similitud
-	 * @param c1 coeficientes 
-	 * @param c2 coeficientes 
-	 * @return double similitud
-	 */
-	private double calculoSimilitud(double[] c1, double[] c2)
-	{
-		if (c1.length == c2.length)
-		{
-			double out = 0.0;
-			double auxC1 = 0.0;
-			double auxC2 = 0.0;
-			for (int i=0; i < c2.length; i++)
-			{
-				out += c1[i]*c2[i];
-				auxC1 += c1[i]*c1[i];
-				auxC2 += c2[i]*c2[i];
-			}
-			
-			out = out / (auxC1*auxC2);
-			
-			return out;
-		}
-		else
-		{
-			throw new RuntimeException("Largo de coeficientes distinto");
-		}
-	}
-	
-	/**
-	 * 
-	 * Obtencion de los coefs. 
-	 * 
-	 * @param query
-	 * @return coeficientes
-	 */
-	private double[] getCoefs(String query)
-	{
-		/**
-		 * Obtencion de las ubicaciones de la palabra en el documento
-		 */
-		Integer[] wordPositionsInteger = this.lista.get(query).toArray(new Integer[0]);
-		
-		/**
-		 * Casting de Integer[] a int[]
-		 */
-		int[] wordPositions = new int[wordPositionsInteger.length];
-		for (int i=0; i < wordPositions.length; i++)
-		{
-			wordPositions[i] = (int)wordPositionsInteger[i] + largo_extra_doc;
-		}
-		
-		/**
-		 * Calculo de los coeficientes.
-		 */
-		this.fourier.setWordPositions(wordPositions);
-		
-		return fourier.calculateCoeffs();
-		
 	}
 }

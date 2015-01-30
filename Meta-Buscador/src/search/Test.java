@@ -25,6 +25,8 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
 
+import util.MathUtil;
+
 public class Test {
 	public Test() throws Exception
 	{
@@ -33,7 +35,8 @@ public class Test {
 			"1 Lorem ipsum javier ad his scripta blandit partiendo, eum fastidii accumsan euripidis in, eum liber hendrerit an. Qui ut wisi vocibus suscipiantur, quo dicit ridens inciderint id. Quo mundi lobortis reformidans eu, legimus senserit definiebas an eos. Eu sit tincidunt incorrupte definitionem, vis mutat affert percipit cu, eirmod consectetuer signiferumque eu per. In usu latine equidem dolores. Quo no falli viris intellegam, ut fugit veritus placerat per",
 			"2 Lorem ipsum ad his scripta blandit partiendo, eum fastidii accumsan javier euripidis in, eum liber hendrerit an. Qui ut wisi vocibus suscipiantur, quo dicit ridens inciderint id. Quo mundi lobortis reformidans eu, legimus senserit definiebas an eos. Eu sit tincidunt incorrupte definitionem, vis mutat affert percipit cu, eirmod consectetuer signiferumque eu per. In usu latine equidem dolores. Quo no falli viris intellegam, ut fugit veritus placerat per",
 			"3 Lorem ipsum ad his scripta blandit partiendo, eum fastidii accumsan euripidis in, eum liber hendrerit an. Qui ut wisi vocibus suscipiantur, quo dicit ridens inciderint id. Quo mundi lobortis reformidans eu, legimus senserit definiebas an eos. Eu sit tincidunt incorrupte definitionem, vis mutat affert javier percipit cu, eirmod consectetuer signiferumque eu per. In usu latine equidem dolores. Quo no falli viris intellegam, ut fugit veritus placerat per",
-			"4 Lorem ipsum ad his scripta blandit partiendo, eum fastidii accumsan euripidis in, eum liber hendrerit an. Qui ut wisi vocibus suscipiantur, quo dicit ridens inciderint id. Quo mundi lobortis reformidans eu, legimus senserit definiebas an eos. Eu sit tincidunt incorrupte definitionem, vis mutat affert percipit cu, eirmod consectetuer signiferumque eu per. In usu latine equidem dolores. Quo no falli viris intellegam, ut fugit veritus placerat per javier"
+			"4 Lorem ipsum ad his scripta blandit partiendo, eum fastidii accumsan euripidis in, eum liber hendrerit an. Qui ut wisi vocibus suscipiantur, quo dicit ridens inciderint id. Quo mundi lobortis reformidans eu, legimus senserit definiebas an eos. Eu sit tincidunt incorrupte definitionem, vis mutat affert percipit cu, eirmod consectetuer signiferumque eu per. In usu latine equidem dolores. Quo no falli viris intellegam, ut fugit veritus placerat per javier",
+			"5 javier hola chao dos tres cuatro 4 javier dos tres dadad da da da da da javier"
 		};
 		
 		Directory dir = new RAMDirectory();
@@ -58,9 +61,8 @@ public class Test {
 			/**
 			 * Calculo del orden del documento.
 			 */
-			float value =(float)(-Math.pow((double)i, 2.0)/Math.pow(4.0, 2.0) + 1.F);
-			System.out.println("value:" + value);
-			writer.addDocument(doc, new PayloadAnalyzer(query,value));
+			
+			writer.addDocument(doc, new PayloadAnalyzer(query,MathUtil.ordenDocumento(i)));
 			System.out.println();
 			System.out.println(Arrays.toString(query.getTerms()));
 			System.out.println(Arrays.toString(query.getValues()));

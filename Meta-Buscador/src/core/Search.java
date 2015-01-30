@@ -35,9 +35,11 @@ public class Search {
 	 * en base a los parametros de distancia, {@link ResultRank}
 	 * @param query consulta a ejecutar.
 	 * @param provider proveedor de servicios de internet.
+	 * @param getGraph si esta como true, el resultado no
+	 *  tendra en consideracion los terminos relacionados ni con sus pesos y generara el grafo de las palabras relacionadas.
 	 * @return {@link ResultRank}
 	 */
-	public static ResultRank initSearch(Query query, Provider provider)
+	public static ResultRank initSearch(Query query, Provider provider, boolean getGraph)
 	{
 		System.out.println("Buscando por: " + query.getQuery());
 		
@@ -129,7 +131,7 @@ public class Search {
 		/**
 		 * Si se encuentra en el cache la query, simplemente se realiza la consulta.
 		 */
-		searcher = new Searcher(query);
+		searcher = new Searcher(query, getGraph);
 		
 		try {
 			rr = searcher.result();

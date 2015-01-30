@@ -13,6 +13,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.similarities.DefaultSimilarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
@@ -39,7 +40,7 @@ public class Searcher {
 	 * <p>Inicia la instancia de b&uacute;squeda, utiliza la base de datos ya creada, para rescatar los documentos.
 	 * @param query
 	 */
-	public Searcher(models.Query query)
+	public Searcher(models.Query query, boolean getGraph)
 	{
 		this.query = query;
 		try {
@@ -53,8 +54,11 @@ public class Searcher {
 			/**
 			 * Analisis del score de cada payload.
 			 * Recibe como parametro la query para poder analizar los pesos de los terminos.
+			 * 
+			 * Si getGraph es true, se utilizara DefaultSimilarity y no se considerara el boosting de palabras.
+			 * en caso contrario, si seran considerados los pesos de los terminos relacionados para calcular el boosting.
 			 */
-			searcher.setSimilarity(new PayloadSimilarity(query));
+			searcher.setSimilarity(getGraph? new DefaultSimilarity(): new PayloadSimilarity(query));
 			
 		} catch (IOException e) {
 			e.printStackTrace();
