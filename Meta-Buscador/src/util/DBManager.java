@@ -74,12 +74,14 @@ public class DBManager {
 			/**
 			 * Remover paginas.
 			 */
+			/*
 			ArrayList<String> urls;
 			urls = getUrls(q);
 			for (String url : urls) {
 				f = new File(baseurl + "pages/" + toSHA2(url));
 				f.delete();
 			}
+			*/
 			
 			/**
 			 * Remover queries

@@ -8,7 +8,7 @@ package search;
  * @since 1.0
  */
 public class Constants {
-	public static final String PATH="/home/javier/files/";
+	public static final String PATH="/Users/javier/files/";
 	public static final String CONTENTS="contents";
 	public static final String URL="url";
 	public static final String TITLE="title";

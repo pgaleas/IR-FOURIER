@@ -30,9 +30,10 @@ public class Principal
 		long init = System.currentTimeMillis();
 		
 		
-		Query q = new Query("facebook");
-		//DBManager.removeQuery(q);
-		Search.initSearch(q, Provider.GOOGLE, true);
+		Query q = new Query("bachelet");
+		q.setTerms(new String[]{"empresarios"});
+		q.setValues(new float[]{1.0F});
+		Search.initSearch(q, Provider.BING, false);
 		
 		
 		try{

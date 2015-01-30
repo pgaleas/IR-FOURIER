@@ -44,5 +44,6 @@ public class MathUtil {
 	public static float ordenDocumento(int ranking)
 	{
 		return (float)((float)(-ranking*ranking)/(float)((2*Constants.PAGES)*(Constants.PAGES)) + 1.0F);
+		//return 1.0F;
 	}
 }

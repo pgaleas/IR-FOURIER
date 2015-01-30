@@ -1,17 +1,22 @@
 package search;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Scanner;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.core.LowerCaseFilter;
+import org.apache.lucene.analysis.core.StopFilter;
 import org.apache.lucene.analysis.core.WhitespaceTokenizer;
+import org.apache.lucene.analysis.util.CharArraySet;
 
 /**
  * 
@@ -75,7 +80,7 @@ public class PayloadAnalyzer extends Analyzer{
 		 */
 		source = new WhitespaceTokenizer(r1);
 		filter = new LowerCaseFilter(source);
-		//filter = new StopFilter(filter, stopWords);
+		filter = new StopFilter(filter, getStopWords());
 		/**
 		 * CountTokenFilter realiza el conteo de palabras y sus posiciones en tiempo de indexacion,
 		 * para luego procesar esa informacion y almacenarla en un payload para cada token.
@@ -108,10 +113,32 @@ public class PayloadAnalyzer extends Analyzer{
 		 */
 		source = new WhitespaceTokenizer(r2);
 		filter = new LowerCaseFilter(source);
-		//filter = new StopFilter(filter, stopWords);
+		filter = new StopFilter(filter, getStopWords());
 		filter = new PayloadFilter(filter, lista, query, docValue);
 		
 		return new TokenStreamComponents(source, filter);
 	}
-
+	
+	/**
+	 * Obtiene la lista de stopwords
+	 */
+	@SuppressWarnings("resource")
+	private CharArraySet getStopWords()
+	{
+		CharArraySet set = new CharArraySet(1000, true);
+		File f = new File(Constants.PATH+"stop.txt");
+		Scanner s;
+		try {
+			s = new Scanner(f);
+			while (s.hasNextLine())
+			{
+				set.add(s.nextLine());
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return set;
+	}
 }

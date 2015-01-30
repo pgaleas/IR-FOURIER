@@ -39,6 +39,7 @@ public class PriorityQueue {
 		terms = new HashMap<>();
 	}
 	
+	/*
 	public void add(String term, float value)
 	{
 		if (value < 0.2F) return;
@@ -81,7 +82,20 @@ public class PriorityQueue {
 		}
 		toArray();
 	}
-	private void toArray()
+	*/
+	
+	public void add(String term, float value)
+	{
+		if (value >= 0.2F)
+		{
+			if (!terms.containsKey(term))
+			{
+				terms.put(term, value);
+			}
+		}
+	}
+	
+	public void toArray()
 	{
 		int size = terms.size();
 		query.setTerms(new String[size]);

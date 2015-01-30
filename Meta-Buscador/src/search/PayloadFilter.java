@@ -50,7 +50,7 @@ public class PayloadFilter extends TokenFilter{
 		this.docValue = docValue;
 		//Conteo de palabras
 		this.pos = 0;
-		this.queue = new PriorityQueue(query, 15);
+		this.queue = new PriorityQueue(query, 10);
 	}
 	
 	/**
@@ -58,7 +58,11 @@ public class PayloadFilter extends TokenFilter{
 	 */
 	@Override
 	public boolean incrementToken() throws IOException {
-		if (!input.incrementToken()) return false;
+		if (!input.incrementToken())
+		{
+			queue.toArray();
+			return false;
+		}
 		
 		/**
 		 * String del token actual.
@@ -66,7 +70,7 @@ public class PayloadFilter extends TokenFilter{
 		StringBuilder builder = new StringBuilder();
 		builder.append(Arrays.copyOfRange(term.buffer(), 0, term.length()));
 		
-		
+		if (!lista.containsKey(query.getQuery())) return true;
 		/**
 		 * Calculo de distancia hacia la query.
 		 */

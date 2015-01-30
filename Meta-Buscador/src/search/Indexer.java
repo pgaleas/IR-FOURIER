@@ -100,6 +100,7 @@ public class Indexer {
 		 * Inicializacion en 0 de las listas de terminos.
 		 * Necesario para calcular el grafo de terminos relacionados.
 		 */
+	
 		query.setTerms(new String[Constants.MAX_TERMS_SIZE]);
 		query.setValues(new float[Constants.MAX_TERMS_SIZE]);
 		for (int i=0; i < Constants.MAX_TERMS_SIZE; i++)
@@ -107,7 +108,7 @@ public class Indexer {
 			query.getTerms()[i] = "";
 			query.getValues()[i] = 0.0F;
 		}
-		
+	
 		for (int i=0; i < pages.length; i++)
 		{
 			System.out.println(pages[i]);

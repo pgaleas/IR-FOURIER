@@ -131,7 +131,8 @@ public class Search {
 			/**
 			 * Luego se almacena el grafo realizado.
 			 */
-			DBManager.addGraph(query);
+			if (getGraph)
+				DBManager.addGraph(query);
 		}
 		else
 		{

@@ -13,14 +13,15 @@ import org.json.simple.JSONValue;
 
 public class GoogleSearchAPI implements WebSearcher {
 
-	/*
+	
 	private String key = "AIzaSyCV7k5XHuO5hEy1y6YjUVHvP2_mMLqtjHE";
 	private String cx = "008965614622624884785:ialisl9b7h4";
-	*/
 	
 	
+	/*
 	private String key = "AIzaSyCslK1FCnCjeAdKHwcVOYCab1om82_7IfE";
 	private String cx = "008965614622624884785:a-y2w5vzeko";
+	*/
 	
 	/*
 	private String key = "AIzaSyC1oAy9PdGGdREeQ2KOMj6CPaj0AhB3U3E";
