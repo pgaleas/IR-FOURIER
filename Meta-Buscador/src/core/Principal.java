@@ -1,6 +1,8 @@
 package core;
 
 
+import java.util.Arrays;
+
 import models.Query;
 import search.Test;
 import util.DBManager;
@@ -28,14 +30,13 @@ public class Principal
 		long init = System.currentTimeMillis();
 		
 		
-		/*
 		Query q = new Query("facebook");
-		DBManager.removeQuery(q);
-		Search.initSearch(q, Provider.GOOGLE);
-		*/
+		//DBManager.removeQuery(q);
+		Search.initSearch(q, Provider.GOOGLE, true);
+		
 		
 		try{
-			new Test();
+			//new Test();
 		} catch(Exception e)
 		{
 			e.printStackTrace();
@@ -47,4 +48,6 @@ public class Principal
 		System.out.println((System.currentTimeMillis() - init)/1000.0F);
 	}
 
+	
+	
 }

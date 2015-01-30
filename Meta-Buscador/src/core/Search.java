@@ -1,6 +1,7 @@
 package core;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import search.Constants;
 import search.Indexer;
@@ -126,12 +127,30 @@ public class Search {
 			 * Se indexan las paginas.
 			 */
 			new Indexer(query);
+			
+			/**
+			 * Luego se almacena el grafo realizado.
+			 */
+			DBManager.addGraph(query);
+		}
+		else
+		{
+			if (getGraph)
+			{
+				/**
+				 * Si la pagina ya existe en cache, y se quiere rescatar el grafo original.
+				 */
+				DBManager.setGraph(query);
+			}
 		}
 		
 		/**
 		 * Si se encuentra en el cache la query, simplemente se realiza la consulta.
 		 */
 		searcher = new Searcher(query, getGraph);
+		
+		System.out.println(Arrays.toString(query.getTerms()));
+		System.out.println(Arrays.toString(query.getValues()));
 		
 		try {
 			rr = searcher.result();

@@ -30,7 +30,7 @@ public class MathUtil {
 		{
 			return 1.0F;
 		}
-		return 1.0F/(float)distancia;
+		return 1.0F/((float)distancia);
 	}
 	
 	/**

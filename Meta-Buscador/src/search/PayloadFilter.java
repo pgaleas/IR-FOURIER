@@ -14,6 +14,7 @@ import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.util.BytesRef;
 
 import util.MathUtil;
+import util.PriorityQueue;
 
 /**
  * 
@@ -32,6 +33,7 @@ public class PayloadFilter extends TokenFilter{
 	private models.Query query;
 	private float docValue;
 	private int pos;
+	private PriorityQueue queue;
 	
 	/**
 	 * Constructor de la clase
@@ -48,6 +50,7 @@ public class PayloadFilter extends TokenFilter{
 		this.docValue = docValue;
 		//Conteo de palabras
 		this.pos = 0;
+		this.queue = new PriorityQueue(query, 15);
 	}
 	
 	/**
@@ -62,6 +65,7 @@ public class PayloadFilter extends TokenFilter{
 		 */
 		StringBuilder builder = new StringBuilder();
 		builder.append(Arrays.copyOfRange(term.buffer(), 0, term.length()));
+		
 		
 		/**
 		 * Calculo de distancia hacia la query.
@@ -80,13 +84,23 @@ public class PayloadFilter extends TokenFilter{
 		 * docValue = 1 -> 0
 		 */
 		similitud*=docValue;
-		System.out.print(builder.toString()+"|"+similitud+" ");
-		
-		
+		/*
+		if (builder.toString().equals(query.getQuery()))
+		{
+			System.out.print(builder.toString().toUpperCase()+"|"+similitud+" ");
+		}
+		else
+		{
+			System.out.print(builder.toString()+"|"+similitud+" ");
+		}
+		*/
+		if (builder.toString().equals(query.getQuery())) return true;
+		queue.add(builder.toString(), similitud);
 		
 		/**
 		 * El orden inicial de los documentos tiene relevancia para la seleccion de los terminos cercanos a la query.
 		 */
+		
 		
 		
 		/**

@@ -16,6 +16,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import search.Constants;
 import models.Page;
 import models.Query;
 
@@ -32,7 +33,7 @@ public class DBManager {
 	/**
 	 * Parametros de configuracion de la base de datos.
 	 */
-	private static String baseurl = "/Users/javier/files/";
+	private static String baseurl = Constants.PATH;
 	private static Scanner s;
 	
 	/**
@@ -90,6 +91,11 @@ public class DBManager {
 			 * Remover el indice
 			 */
 			removeIndex(q);
+			
+			/**
+			 * Remueve el grafo
+			 */
+			removeGraph(q);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -110,6 +116,17 @@ public class DBManager {
 		}
 		f.delete();
 	}
+	
+	/**
+	 * Remueve solamente el grafo generado.
+	 * @param q
+	 */
+	public static void removeGraph(Query q)
+	{
+		File f = new File(baseurl + "graphs/" + toSHA2(q.getQuery()));
+		f.delete();
+	}
+	
 	
 	/**
 	 * Ingresa una query a la base de datos, incluyendo las paginas relacionadas a la misma.
@@ -206,10 +223,60 @@ public class DBManager {
 		{
 			return null;
 		}
-		
-		
 	}
 	
+	/**
+	 * Incluye el grafo generado a la BD
+	 * 
+	 * @param query del grafo generado
+	 */
+	public static void addGraph(Query query)
+	{
+		try 
+		{
+			File f= new File(baseurl+"graphs/"+toSHA2(query));
+			f.createNewFile();
+			BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+			for (int i=0; i < query.getTerms().length; i++) {
+				bw.write(query.getTerms()[i]+" "+query.getValues()[i]);
+				if (i+1 < query.getTerms().length) bw.newLine();
+			}
+			bw.flush();
+			bw.close();
+		} catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Se ingresan los valores originales del grafo calculado.
+	 * 
+	 * @param query
+	 * @throws FileNotFoundException 
+	 */
+	public static void setGraph(Query query)
+	{
+		File f = new File(baseurl + "graphs/" + toSHA2(query));
+		try {
+			s = new Scanner(f);
+			ArrayList<String> terms = new ArrayList<>();
+			while (s.hasNext()) terms.add(s.nextLine());
+			
+			query.setTerms(new String[terms.size()]);
+			query.setValues(new float[terms.size()]);
+			
+			for (int i=0; i < terms.size(); i++)
+			{
+				String t[] = terms.get(i).split(" ");
+				query.getTerms()[i] = t[0];
+				query.getValues()[i] = Float.parseFloat(t[1]);
+			}
+			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	/**
 	 * Obtiene un arreglo con las urls de una query.
@@ -259,6 +326,25 @@ public class DBManager {
 	public static String toSHA2(Query q)
 	{
 		return toSHA2(q.getQuery());
+	}
+	
+	
+	
+	/**
+	 * Genera las carpetas del sistema
+	 * 
+	 * <p>Genera las carpetas usadas por el sistema para almacenar en cache las paginas e indices.
+	 */
+	public static void createFolders()
+	{
+		File f = new File(baseurl + "queries/");
+		f.mkdir();
+		f = new File(baseurl + "pages/");
+		f.mkdir();
+		f = new File(baseurl + "indexes/");
+		f.mkdir();
+		f = new File(baseurl + "graphs/");
+		f.mkdir();
 	}
 
 

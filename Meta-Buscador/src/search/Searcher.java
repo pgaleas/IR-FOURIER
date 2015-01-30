@@ -13,6 +13,8 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.payloads.AveragePayloadFunction;
+import org.apache.lucene.search.payloads.PayloadTermQuery;
 import org.apache.lucene.search.similarities.DefaultSimilarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -82,20 +84,24 @@ public class Searcher {
 		 */
 		TermQuery term = new TermQuery(new Term(Constants.CONTENTS, query.getQuery()));
 		
+		
+		
 		/**
 		 * Consultas secundarias.
 		 */
-		//PayloadTermQuery term1 = new PayloadTermQuery(new Term("body", "chao"), new AveragePayloadFunction());
-		//PayloadTermQuery term2= new PayloadTermQuery(new Term("body", "chao"), new AveragePayloadFunction());
 		BooleanQuery bq = new BooleanQuery();
 		bq.add(term, Occur.MUST);
-		//bq.add(term1, Occur.SHOULD);
-		//bq.add(term2, Occur.SHOULD);
+		for (int i=0; i < query.getTerms().length; i++)
+		{
+			
+			bq.add(new PayloadTermQuery(new Term(Constants.CONTENTS, query.getTerms()[i]),
+					new AveragePayloadFunction()), Occur.SHOULD);
+		}
 		
 		/**
 		 * Obtencion de los documentos con mejor score.
 		 */
-		TopDocs docs = searcher.search(bq, 10);
+		TopDocs docs = searcher.search(bq, Constants.MAX_SEARCH);
 		printResults(searcher, bq, docs);
 		return null;
 	}

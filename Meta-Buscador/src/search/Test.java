@@ -30,27 +30,16 @@ import util.MathUtil;
 public class Test {
 	public Test() throws Exception
 	{
-		models.Query query = new models.Query("javier");
+		models.Query query = new models.Query("queue");
 		String docs[] = {
-			"1 Lorem ipsum javier ad his scripta blandit partiendo, eum fastidii accumsan euripidis in, eum liber hendrerit an. Qui ut wisi vocibus suscipiantur, quo dicit ridens inciderint id. Quo mundi lobortis reformidans eu, legimus senserit definiebas an eos. Eu sit tincidunt incorrupte definitionem, vis mutat affert percipit cu, eirmod consectetuer signiferumque eu per. In usu latine equidem dolores. Quo no falli viris intellegam, ut fugit veritus placerat per",
-			"2 Lorem ipsum ad his scripta blandit partiendo, eum fastidii accumsan javier euripidis in, eum liber hendrerit an. Qui ut wisi vocibus suscipiantur, quo dicit ridens inciderint id. Quo mundi lobortis reformidans eu, legimus senserit definiebas an eos. Eu sit tincidunt incorrupte definitionem, vis mutat affert percipit cu, eirmod consectetuer signiferumque eu per. In usu latine equidem dolores. Quo no falli viris intellegam, ut fugit veritus placerat per",
-			"3 Lorem ipsum ad his scripta blandit partiendo, eum fastidii accumsan euripidis in, eum liber hendrerit an. Qui ut wisi vocibus suscipiantur, quo dicit ridens inciderint id. Quo mundi lobortis reformidans eu, legimus senserit definiebas an eos. Eu sit tincidunt incorrupte definitionem, vis mutat affert javier percipit cu, eirmod consectetuer signiferumque eu per. In usu latine equidem dolores. Quo no falli viris intellegam, ut fugit veritus placerat per",
-			"4 Lorem ipsum ad his scripta blandit partiendo, eum fastidii accumsan euripidis in, eum liber hendrerit an. Qui ut wisi vocibus suscipiantur, quo dicit ridens inciderint id. Quo mundi lobortis reformidans eu, legimus senserit definiebas an eos. Eu sit tincidunt incorrupte definitionem, vis mutat affert percipit cu, eirmod consectetuer signiferumque eu per. In usu latine equidem dolores. Quo no falli viris intellegam, ut fugit veritus placerat per javier",
-			"5 javier hola chao dos tres cuatro 4 javier dos tres dadad da da da da da javier"
+			"An unbounded priority queue based on a priority heap. The elements of the priority queue are ordered according to their natural ordering, or by a Comparator provided at queue construction time, depending on which constructor is used. A priority queue does not permit null elements. A priority queue relying on natural ordering also does not permit insertion of non-comparable objects (doing so may result in ClassCastException).",
+			"The head of this queue is the least element with respect to the specified ordering. If multiple elements are tied for least value, the head is one of those elements -- ties are broken arbitrarily. The queue retrieval operations poll, remove, peek, and element access the element at the head of the queue.",
+			"This class and its iterator implement all of the optional methods of the Collection and Iterator interfaces. The Iterator provided in method iterator() is not guaranteed to traverse the elements of the priority queue in any particular order. If you need ordered traversal, consider using Arrays.sort(pq.toArray())."
 		};
 		
 		Directory dir = new RAMDirectory();
 		IndexWriterConfig config = new IndexWriterConfig(Version.LATEST, new PayloadAnalyzer(query,0));
 		IndexWriter writer = new IndexWriter(dir, config);
-		
-		query.setTerms(new String[9]);
-		query.setValues(new float[9]);
-		
-		for (int i=0; i < 9; i++)
-		{
-			query.getTerms()[i] = "";
-			query.getValues()[i] = 0.0F;
-		}
 		
 		for (int i=0; i < docs.length; i++)
 		{
@@ -64,14 +53,12 @@ public class Test {
 			
 			writer.addDocument(doc, new PayloadAnalyzer(query,MathUtil.ordenDocumento(i)));
 			System.out.println();
-			System.out.println(Arrays.toString(query.getTerms()));
-			System.out.println(Arrays.toString(query.getValues()));
-			System.out.println("---------");
 			writer.commit();
 		}
 		
 		writer.close();
-		
+		System.out.println(Arrays.toString(query.getValues()));
+		System.out.println(Arrays.toString(query.getTerms()));
 		IndexSearcher searcher = new IndexSearcher(DirectoryReader.open(dir));
 		searcher.setSimilarity(new PayloadSimilarity(query));
 		
